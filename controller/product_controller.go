@@ -94,3 +94,45 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 		"products": product,
 	})
 }
+
+func (p *productController) DeleteProcuctById(ctx *gin.Context){
+	id := ctx.Param("productId")
+
+	if id == ""{
+		reponse := model.Response{
+			Message: "Id do produto não pode ser nulo",
+		}
+		ctx.JSON(http.StatusBadRequest, reponse)
+		return
+	}
+
+	productId, err := strconv.Atoi(id)
+
+	if err != nil {
+		reponse := model.Response{
+			Message: "Id do produto precisa ser um número",
+		}
+		ctx.JSON(http.StatusBadRequest, reponse)
+		return
+	}
+
+	product, err := p.productUseCase.DeleteProcuctById(productId)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	if product == nil {
+		reponse := model.Response{
+			Message: "Produto não encontrado na base de dados",
+		}
+		ctx.JSON(http.StatusBadRequest, reponse)
+		return
+		
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"products": product,
+	})
+}

@@ -40,3 +40,14 @@ func (pu *ProductUseCase) GetProductById(id_product int) (*model.Product, error)
 
 	return product, nil
 }
+
+func (pu *ProductUseCase) DeleteProcuctById(id_product int) (*model.Product, error){
+
+	product, err := pu.repository.DeleteProcuctById(id_product)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
+}
