@@ -91,7 +91,7 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"products": product,
+		"product": product,
 	})
 }
 
@@ -134,5 +134,48 @@ func (p *productController) DeleteProcuctById(ctx *gin.Context){
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"products": product,
+	})
+}
+
+func (p *productController) UpdateProduct(ctx *gin.Context){
+
+	var productUpdate *model.Product
+	
+	if err := ctx.BindJSON(&productUpdate); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "message": "Erro ao processar o corpo da requisição",
+            "error":   err.Error(),
+        })
+        return
+    }
+
+	product, err := p.productUseCase.GetProductById(productUpdate.ID)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	if product == nil {
+		reponse := model.Response{
+			Message: "Produto não encontrado na base de dados",
+		}
+		ctx.JSON(http.StatusBadRequest, reponse)
+		return
+		
+	}
+
+	product, err = p.productUseCase.UpdateProduct(*productUpdate)
+	
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Erro ao atualizar o produto",
+			"error":   err.Error(),	
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"product": product,
 	})
 }
